@@ -1,0 +1,29 @@
+from fastapi.responses import HTMLResponse
+
+from fastapi import  WebSocketDisconnect
+
+active_users = []
+
+class ChatService:
+
+    def home(self): 
+        f=open("templates/index.html", "r")  
+        return HTMLResponse(f.read()) 
+    
+    async def chat_room(self,websocket):
+        await websocket.accept()
+        active_users.append(websocket)
+        print("New user joined. Active users:", len(active_users))
+
+        try:
+            while True:
+                message = await websocket.receive_text()
+                print("Message received:", message)
+
+               
+                for user in active_users:
+                    await user.send_text(message)
+
+        except WebSocketDisconnect:
+            active_users.remove(websocket)
+            print("User left. Active users:", len(active_users))
