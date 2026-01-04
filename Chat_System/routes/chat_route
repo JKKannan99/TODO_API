@@ -1,0 +1,15 @@
+from fastapi import APIRouter,WebSocket
+
+from services.chat_service import *
+
+chat_route = APIRouter()
+
+cs=ChatService()
+
+@chat_route.get("/")
+def home():   
+    return cs.home()
+
+@chat_route.websocket("/ws")
+def chat_room(websocket: WebSocket):
+    return cs.chat_room(websocket)
